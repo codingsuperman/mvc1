@@ -1,5 +1,4 @@
-package chapter3;
-
+//this is the algorithm for the mvc problem
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
@@ -28,24 +27,24 @@ class Edge {
 }
 
 class Graph {
-	int edgeNum;
+	int numEdge;
 	List<Edge>[] nodes;
 	ArrayList<Integer> vertices;
 	ArrayList<Edge> edges;
 
-	public Graph(int nodeNum, int edgeNum) {
+	public Graph(int nodeNum, int numEdge) {
 		nodes = new List[nodeNum];
 		vertices = new ArrayList<Integer>();
-		this.edgeNum = edgeNum;
+		this.numEdge = numEdge;
 		this.edges = new ArrayList<Edge>();
 	}
 }
 
 class Bnb implements Solver {
 	Graph graph;
-	int bestResult;
+	int MiniResult;
 	boolean[] presence;
-	List<Integer> intermRes;
+	List<Integer> currentRes;
 	List<Integer> result;
 	List<String> trace;
 	long startTime;
@@ -56,8 +55,8 @@ class Bnb implements Solver {
 		this.cutoff = cutoff;
 		startTime = System.currentTimeMillis();
 		trace = new ArrayList<String>();
-		bestResult = Integer.MAX_VALUE; // MAX_VALUE as initial upper bound
-		intermRes = new ArrayList<Integer>();
+		MiniResult = Integer.MAX_VALUE; // MAX_VALUE as initial upper bound
+		currentRes = new ArrayList<Integer>();
 		presence = new boolean[graph.nodes.length]; // record whether node is used
 
 		solve(0);
@@ -66,44 +65,44 @@ class Bnb implements Solver {
 	private void solve(int start) {
 		if (start == graph.nodes.length) { // have checked all nodes
 
-			if (intermRes.size() < bestResult) { // if this result is better than upper bound, update it
-				result = new ArrayList<Integer>(intermRes);
-				bestResult = intermRes.size();
+			if (currentRes.size() < MiniResult) { // if this result is better than upper bound, update it
+				result = new ArrayList<Integer>(currentRes);
+				MiniResult = currentRes.size();
 
 				long endTime = System.currentTimeMillis();
 				double duration = (double) (endTime - startTime) / 1000;
-				trace.add(String.format("%.2f", duration) + "," + bestResult);
+				trace.add(String.format("%.2f", duration) + "," + MiniResult);
 				System.out.println(trace.get(trace.size() - 1));
 			}
 			return;
 		}
 		for (int i = start; i < graph.nodes.length; i++) {
-			if (intermRes.size() >= bestResult - 1) {
+			if (currentRes.size() >= MiniResult - 1) {
 				break; // if the size of current solution plus lower bound (which is 1) is greater than
 			} // upper bound, cut off
 
-			int k = 0;
+			int m = 0;
 			List<Edge> neighbors = graph.nodes[i];
-			while (k < neighbors.size() && presence[neighbors.get(k).otherNode(i)]) { // count how many neighbor covered
-				k++;
+			while (m < neighbors.size() && presence[neighbors.get(m).otherNode(i)]) { // count how many neighbor covered
+				m++;
 			}
-			if (k == neighbors.size()) {
+			if (m == neighbors.size()) {
 				continue; // if all neighbor covered, don't need to add this one
 			}
 			presence[i] = true; // add this node in solution
-			intermRes.add(i);
+			currentRes.add(i);
 			if ((System.currentTimeMillis() - startTime) / 1000 > cutoff) {
 				return;
 			}
 			solve(i + 1); // go check remaining graph
-			intermRes.remove(intermRes.size() - 1);// remove it
+			currentRes.remove(currentRes.size() - 1);// remove it
 			presence[i] = false;
-			while (k < neighbors.size()
-					&& (neighbors.get(k).otherNode(i) > i || presence[neighbors.get(k).otherNode(i)])) { // count how
+			while (m < neighbors.size()
+					&& (neighbors.get(m).otherNode(i) > i || presence[neighbors.get(m).otherNode(i)])) { // count how
 																											// covered
-				k++;
+				m++;
 			}
-			if (k < neighbors.size()) { // if any of the neighbors with smaller index are not covered, we can't skip
+			if (m < neighbors.size()) { // if any of the neighbors with smaller index are not covered, we can't skip
 										// this node, otherwise will leave some edge never covered. So break
 				break;
 			}
@@ -123,7 +122,7 @@ class Bnb implements Solver {
 
 }
 
-public class RunExperiments_1 {
+public class backtracking {
 	public static void main(String[] args) throws Exception {
 
 		if (args.length < 4) {
@@ -146,15 +145,12 @@ public class RunExperiments_1 {
 			System.out.println("Incorrect input");
 			System.exit(0);
 		}
-		if ((alg.equals("LS1") || alg.equals("LS2")) && (seed.equals(""))) {
-			System.out.println("Seed is required for local search to run");
-			System.exit(0);
-		}
+		
 
 		String output_sol = "", output_trace = "";
 		int end = inst.indexOf(".graph");
 		int start = inst.lastIndexOf("/");
-		if (alg.equals("BnB") || alg.equals("Approx")) {
+		if (alg.equals("backtracking") || alg.equals("Approx")) {
 			output_sol = inst.substring(start + 1, end) + "_" + alg + "_" + time + ".sol";
 			output_trace = inst.substring(start + 1, end) + "_" + alg + "_" + time + ".trace";
 		} else {
@@ -167,7 +163,7 @@ public class RunExperiments_1 {
 		Graph G = parseGraph(inst);
 		Solver solver = null;
 
-		if (alg.equals("BnB")) {
+		if (alg.equals("backtracking")) {
 			solver = new Bnb(G, Double.parseDouble(time));
 		}
 		if (solver == null)
@@ -202,8 +198,8 @@ public class RunExperiments_1 {
 		String line = br.readLine();
 		String[] split = line.split(" ");
 		int nodeNum = Integer.parseInt(split[0]);
-		int edgeNum = Integer.parseInt(split[1]);
-		Graph G = new Graph(nodeNum, edgeNum);
+		int numEdge = Integer.parseInt(split[1]);
+		Graph G = new Graph(nodeNum, numEdge);
 		for (int i = 0; i < nodeNum; i++) {
 			G.nodes[i] = new ArrayList<Edge>();
 		}
