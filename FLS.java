@@ -255,13 +255,13 @@ public class FLS {
 		List<String> traces = solver.getTrace();
 
 		StringBuilder sb = new StringBuilder();
-		for (int num : res) { // assemble sol file
+		for (int num : res) { 
 			sb.append(Integer.toString(num + 1));
 			sb.append(", ");
 		}
 
 		System.out.println(sb.toString());
-		 // print trace file
+		
 			for (String trace : traces) {
 				trace_writer.println(trace);
 				System.out.println(trace);
