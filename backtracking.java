@@ -102,7 +102,7 @@ class b1 implements Solver {
 																											
 				m++;
 			}
-			if (m < neighbors.size()) { /
+			if (m < neighbors.size()) { 
 										
 				break;
 			}
